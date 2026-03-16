@@ -22,8 +22,8 @@ flowchart LR
     ALB[Internal ALB\nHTTPS 443]
     subgraph ECS[ECS Fargate]
       OM[openmetadata-server\nport 8585]
-      ING[openmetadata-ingestion\n(Airflow) port 8080]
-      INIT[openmetadata-init\n(one-off task)]
+      ING[openmetadata-ingestion\nAirflow port 8080]
+      INIT[openmetadata-init\none-off task]
     end
     CM[(Cloud Map\nom-cloud-dwh.local)]
     SG[(Security Groups)]
@@ -65,9 +65,9 @@ flowchart LR
   CM -.-> OM
   CM -.-> ING
 
-  ALB -. health .-> OM
-  ING -. health .->|/health 8080| CM
-  OM -. health .->|/signin 8585| ALB
+  ALB -. "health" .-> OM
+  ING -. "health /health 8080" .-> CM
+  OM -. "health /signin 8585" .-> ALB
 ```
 
 **Luồng chính:**
