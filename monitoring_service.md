@@ -9,7 +9,7 @@ Tài liệu này mô tả kiến trúc, tham số cấu hình và cơ chế aler
 - **Lambda Functions**: triển khai từ zip/S3; dùng IAM role chung; có thể đặt VPC, DLQ, X-Ray, layers. 
 - **SNS → Lambda triggers**: mapping `lambda_sns_triggers` tạo permission + subscription tự động. Flow alert: Grafana (contact point) hoặc producer khác publish SNS `alerts` → Lambda `processor` (nếu cấu hình) → webhook/Teams/Slack tùy logic code.
 
-### Sơ đồ mermaid
+### Sơ đồ
 ```mermaid
 flowchart LR
   subgraph Monitoring VPC
@@ -60,7 +60,9 @@ Tham khảo `variables.tf`; ví dụ giá trị trong `envs/dev/terraform.tfvars
 - `lambda_sns_triggers`: map `{ key = { lambda_key, sns_key } }` tạo permission + subscription
 
 ## Cách alert hoạt động
-- **Định tuyến theo mức độ (label)**: cấu hình contact point/route trong Grafana để gửi vào SNS `alerts`. Ví dụ: `warning` → chỉ email subscribers; `critical` → email subscribers **và** Lambda `processor` để fan-out thêm webhook/Teams/Slack.
+- **Định tuyến theo mức độ (label)**: cấu hình contact point/route trong Grafana để gửi vào SNS `alerts`.
+  - `level=warning` → chỉ email subscribers;
+  - `level=critical` → email subscribers **và** Lambda `processor` để fan-out thêm webhook/Teams/Slack.
 - **Qua SNS → Lambda**: các dịch vụ khác cũng có thể publish vào topic. Lambda được map qua `lambda_sns_triggers` và sẽ fan-out theo logic code (vd `TEAMS_WEBHOOK_URL`).
 - **Grafana unified alerting**: tạo alert rule, set contact point là SNS topic này để thừa kế định tuyến trên.
 - **Bảo mật & phân quyền**: IAM role giới hạn dịch vụ được assume (`trusted_role_services`). Email subscribers chỉ được gắn khi `enable_alert_email_subscribers=true` để tránh spam.
